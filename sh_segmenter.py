@@ -80,8 +80,8 @@ def call_sh(parameters):
         Returns the response
     """
     
-    #urlname = "http://sanskrit.inria.fr/cgi-bin/SKT/sktgraph2.cgi"
-    urlname = "http://localhost/cgi-bin/SKT_experimental/sktgraph2"
+    urlname = "http://sanskrit.inria.fr/cgi-bin/SKT/sktgraph2.cgi"
+#    urlname = "http://localhost/cgi-bin/SKT_experimental/sktgraph2"
     
     response = requests.get(url = urlname, params = parameters)
     

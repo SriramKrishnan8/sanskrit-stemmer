@@ -1,6 +1,6 @@
 # Sanskrit Stemmer using Sanskrit Heritage Segmenter
 
-The Sanskrit Heritage Platform hosts various tools of which the Segmenter is used to fetch the morphological analysis of a given word. The Segmenter uses its own lexicon and finite state automata for the process of both segmentation and morphological parsing.
+The [Sanskrit Heritage Platform](https://sanskrit.inria.fr/) hosts various tools of which the Segmenter is used to fetch the morphological analysis of a given word. The Segmenter uses its own lexicon and finite state automata for the process of both segmentation and morphological parsing.
 
 There could be multiple possible morphological analysis and hence all of these are produced by the Stemmer.
 
