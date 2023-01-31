@@ -4,6 +4,19 @@ The [Sanskrit Heritage Platform](https://sanskrit.inria.fr/) hosts various tools
 
 There could be multiple possible morphological analysis and hence all of these are produced by the Stemmer.
 
+## Pre-requisites
+
+1. By default, the stemmer fetches the results from the server (https://sanskrit.inria.fr). Alternatively, the entire Sanskrit Heritage Platform can be installed locally and the stemmer can access the local segmenter for the analysis. The global parameter `urlname` in `sh_segmenter.py` should be changed.
+2. The following packages are mandatory:
+    * requests
+	* psutil
+	* tqdm
+
+These can be installed using pip:
+```
+pip3 install requests psutil tqdm
+```
+
 ## Usage
 
 ```
