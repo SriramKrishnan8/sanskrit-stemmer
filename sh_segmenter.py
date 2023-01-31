@@ -9,6 +9,13 @@ import signal
 import psutil
 
 
+urlname = "http://sanskrit.inria.fr/cgi-bin/SKT/sktgraph2.cgi"
+# if the Sanskrit Heritage Platform is installed in the machine,
+# instead of fetching from the server like above, use the
+# following and comment the previous line
+# urlname = "http://localhost/cgi-bin/SKT/sktgraph2"
+
+
 def get_env_variables(input_text, type_of_segmentation):
     """ Returns the parameters for the cgi call """
     
@@ -80,17 +87,23 @@ def call_sh(parameters):
         Returns the response
     """
     
-    urlname = "http://sanskrit.inria.fr/cgi-bin/SKT/sktgraph2.cgi"
-#    urlname = "http://localhost/cgi-bin/SKT_experimental/sktgraph2"
-    
-    response = requests.get(url = urlname, params = parameters)
-    
-    return response
+    try:
+        response = requests.get(url = urlname, params = parameters)
+        response_obj = json.loads(response.text)
+        response_json = json.dumps(response_obj)
+    except Exception as e:
+        exception = {}
+        exception["error"] = str(e)
+        response_json = json.dumps(exception)
+        
+    return response_json
     
 
 
 def request_word_analysis(input_text):
-    """ Returns all possible morphological analyses for the input """
+    """ Sets the parameters for word analysis
+        Returns all possible morphological analyses for the input
+    """
     
     env_vars = {
         "lex":"SH", "st":"f", "us":"f", "font":"roma", "t":"WX",
@@ -98,14 +111,13 @@ def request_word_analysis(input_text):
         "stemmer":"t"
     }
     
-    response = call_sh(env_vars)
-    r_json = json.loads(response.text)
-    
-    return r_json
+    return call_sh(env_vars)
     
 
 def request_sentence_analysis_joint(input_text):
-    """ Returns the analyses of a segmented sentence """
+    """ Sets the parameters for joint sentence analysis
+        Returns the analyses of a segmented sentence
+    """
     
     env_vars = {
         "lex":"SH", "st":"t", "us":"t", "font":"roma", "t":"WX",
@@ -113,10 +125,7 @@ def request_sentence_analysis_joint(input_text):
         "stemmer":"t"
     }
     
-    response = call_sh(env_vars)
-    r_json = json.loads(response.text)
-    
-    return r_json
+    return call_sh(env_vars)
     
     
 def request_sentence_analysis_iterative(input_text):
@@ -132,12 +141,66 @@ def request_sentence_analysis_iterative(input_text):
         all_analyses.append(morph_analysis)
     
     return all_analyses
+    
+
+def get_normalized_word(word):
+    """ Returns the word in the normalized form.  Normalization
+        takes place at the end of the words. If the word ends in
+        anusvAra (M), then it is changed to (m)
+
+        Sanskrit Heritage Segmenter presently does not accept 
+        words ending in anusvAra (M)
+    """
+
+    word = word[:-1] + "m" if word[-1] == "M" else word
+
+    return word
 
 
-#print("Segmenter Word -> " + str(run_sh("xaSaraWaH", "https://sanskrit.inria.fr/cgi-bin/SKT/sktgraph.cgi", "sentence")[0]) + "\n")
-#print("Segmenter Word -> " + str(run_sh("xaSaraWaH", "/usr/lib/cgi-bin/SKT/sktgraph", "sentence")[0]) + "\n")
-#print("Segmenter Sentence -> " + str(run_sh("AxISvarAya praNamAmi wasmE yena upaxiRtA haTayogavixyA", "/usr/lib/cgi-bin/SKT/sktgraph", "sentence")[0]) + "\n")
-#print("Stemmer Word -> " + str(request_word_analysis("xaSaraWaH")) + "\n")
-#print("Stemmer Sentence (Iterative) -> " + str(request_sentence_analysis_iterative("AxISvarAya praNamAmi wasmE yena upaxiRtA haTayogavixyA")) + "\n")
-#print("Stemmer Sentence (Joint) -> " + str(request_sentence_analysis_joint("AxISvarAya praNamAmi wasmE yena upaxiRtA haTayogavixyA")) + "\n")
+def get_stemmer_fn(stemmer_format):
+    """ Returns the stemmer function according to the stemmer 
+        format
+    """
+    
+    if stemmer_format == "word":
+        stemmer_fn = request_word_analysis
+    elif stemmer_format == "sent-iter":
+        stemmer_fn = request_sentence_analysis_iterative
+    elif stemmer_format == "sent-joint":
+        stemmer_fn = request_sentence_analysis_joint
+    # The following two cases are under development and hence commented out
+    #elif stemmer_format == "word-full":
+    #    stemmer_fn = request_word_analysis
+    #elif stemmer_format == "sent-full":
+    #    stemmer_fn = request_word_analysis
+    else:
+        stemmer_fn = request_word_analysis
+
+    return stemmer_fn
+
+
+def run_stemmer_fn(input_text, stemmer_fn):
+    """ Normalizes the input_text
+        Calls the segmenter with appropriate modes
+        Returns the results of the stemmer
+
+        Avoids checking the stemmer function. One can either run the
+        stemmer directly from here after getting the stemmer_fn or
+        call the stemmer from "run_stemmer"
+    """
+
+    normalized_input = get_normalized_word(input_text)
+
+    return stemmer_fn(normalized_input)
+
+
+def run_stemmer(input_text, stemmer_format):
+    """ Gets the stemmer function and redirects to "run_stemmer_fn" to
+        normalize the input_text and run the stemmer.  If the
+        stemmer_fn is already obtained, call "run_stemmer_fn"
+    """
+
+    stemmer_fn = get_stemmer_fn(stemmer_format)
+    
+    return run_stemmer_fn(input_text, stemmer_fn)
 
