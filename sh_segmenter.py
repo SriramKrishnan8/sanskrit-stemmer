@@ -84,7 +84,7 @@ def call_sh(parameters):
     """ Calls the cgi of Sanskrit Heritage Segmenter with the 
         parameters
         
-        Returns the response
+        Returns the response as json
     """
     
     try:
@@ -107,7 +107,7 @@ def request_word_analysis(input_text):
     
     env_vars = {
         "lex":"SH", "st":"f", "us":"f", "font":"roma", "t":"WX",
-        "text": input_text.replace(" ", "+"), "mode":"b",
+        "text": input_text, "mode":"b",
         "stemmer":"t"
     }
     
@@ -120,8 +120,8 @@ def request_sentence_analysis_joint(input_text):
     """
     
     env_vars = {
-        "lex":"SH", "st":"t", "us":"t", "font":"roma", "t":"WX",
-        "text": input_text.replace(" ", "+"), "mode":"b",
+        "lex":"SH", "st":"t", "us":"f", "font":"roma", "t":"WX",
+        "text": input_text, "mode":"b",
         "stemmer":"t"
     }
     
