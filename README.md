@@ -12,15 +12,15 @@ There could be multiple possible morphological analysis and hence all of these a
 	* psutil
 	* tqdm
 
-These can be installed using pip:
-```
-pip3 install requests psutil tqdm
-```
+    These can be installed using pip:
+    ```
+    pip3 install requests psutil tqdm
+    ```
 
 ## Usage
 
 ```
-sh sanskrit_stemmer.sh gacCawi word
+python3 sanskrit_stemmer.py gacCawi word
 ```
 
 ## Result
@@ -53,13 +53,18 @@ The input_text is required in WX notation. The following are the accepted format
 ## Output
 
 There are two parts of the output: word and morph.
-1. word -> list of possible word form(s) (includes compound-splits also)
-2. morph -> list of possible morphological analyses
+1. word -> list of possible word form(s) (includes compound-splits also). For input as sentences, this field would produce the best possible segmentation solutions.
+2. morph -> list of possible morphological analyses with each **morph** having the following keys:
+    * derived_stem -> prātipadika
+    * base -> root (dhātu)
+    * derivational_morph -> derivational morphological analysis (primary or secondary)
+    * inflectional_morphs -> list of possible inflectional morphological analysis
 
-Each **morph** has the following keys:
-* derived_stem -> prātipadika
-* base -> root (dhātu)
-* derivational_morph -> derivational morphological analysis (primary or secondary)
-* inflectional_morphs -> list of possible inflectional morphological analysis
+    The stem / base may contain indices indicating the homonymy index of the stem in the Sanskrit Heritage Lexicon.
 
-The stem / base may contain indices indicating the homonymy index of the stem in the Sanskrit Heritage Lexicon.
+## Additional Information
+
+1. An ipython notebook (`Sanskrit Stemmer Instructions`) is provided for basic usage of the stemmer.
+2. A sample notebook (`sample_stemming.ipynb`) is provided with examples from the instructions.
+3. Sample files with input words and sentences (`sample_input_words.txt`, `sample_input_sents.txt`) are provided for testing the stemmer.
+4. A shell script (`sanskrit_stemmer.sh`) with examples is provided to run the scripts. Uncomment each to try out the examples from the terminal.
